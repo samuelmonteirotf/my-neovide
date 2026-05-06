@@ -49,6 +49,33 @@ Optional but recommended for docs mode:
 
 ## Install
 
+### Arch-based Linux (Arch, Manjaro, EndeavourOS, Garuda, CachyOS, Artix)
+
+A single script handles every dependency, the clone, the first plugin sync, the Mason language servers and the shell aliases. It is idempotent — re-running is safe.
+
+Inspect it first, then execute:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/samuelmonteirotf/my-neovide/main/scripts/install-arch.sh | less
+curl -fsSL https://raw.githubusercontent.com/samuelmonteirotf/my-neovide/main/scripts/install-arch.sh | bash
+```
+
+Or clone and run locally:
+
+```bash
+git clone https://github.com/samuelmonteirotf/my-neovide.git /tmp/my-neovide
+bash /tmp/my-neovide/scripts/install-arch.sh
+```
+
+When it finishes:
+
+```bash
+source ~/.zshrc   # or ~/.bashrc
+nv                # opens Neovide on your notes vault
+```
+
+### Manual install (any OS)
+
 ```bash
 mv ~/.config/nvim ~/.config/nvim.bak 2>/dev/null
 git clone https://github.com/samuelmonteirotf/my-neovide.git ~/.config/nvim
