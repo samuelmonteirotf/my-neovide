@@ -1,26 +1,36 @@
--- Aqui sobrescrevemos os padrões do LazyVim para deixar mais a sua cara
+--------------------------------------------------------------------------------
+-- Editor options (overrides on top of LazyVim defaults)
+--------------------------------------------------------------------------------
+
 local opt = vim.opt
 
--- 1. Indentação (2 espaços é o padrão ouro para React/Next.js/TS)
-opt.shiftwidth = 2
-opt.tabstop = 2
-opt.expandtab = true
+-- ── Indentation (2 spaces — TS/React/Lua house style) ────────────────────────
+opt.shiftwidth  = 2
+opt.tabstop     = 2
+opt.expandtab   = true
 
--- 2. Navegação Ninja
--- Números de linha relativos: Isso é ESSENCIAL para você usar os atalhos de pulo (ex: 10j, 5k)
-opt.relativenumber = true
+-- ── Navigation ───────────────────────────────────────────────────────────────
+opt.relativenumber = true   -- enables `10j` / `5k` motion counts
+opt.scrolloff      = 8      -- keep cursor 8 lines away from screen edges
+opt.sidescrolloff  = 8
 
--- Mantém o cursor mais centralizado na tela quando você rola o código para baixo/cima
-opt.scrolloff = 8
-opt.sidescrolloff = 8
+-- ── Visual ───────────────────────────────────────────────────────────────────
+opt.wrap        = false     -- code: no soft-wrap (overridden in markdown)
+opt.colorcolumn = "80"      -- 80-column ruler
 
--- 3. Visual e Leitura
--- Desativa a quebra de linha visual (textos longos não vão para a linha de baixo sozinhos)
-opt.wrap = false
+-- ── Performance ──────────────────────────────────────────────────────────────
+opt.updatetime  = 50        -- faster CursorHold (LSP hover, gitsigns)
+opt.timeoutlen  = 300       -- which-key popup delay
+opt.ttimeoutlen = 0         -- ESC sequence: instant
+opt.redrawtime  = 1500
+opt.synmaxcol   = 300       -- skip syntax on absurdly long lines (logs/min.js)
+opt.history     = 200
 
--- Mostra uma linha invisível no limite de 80 caracteres (bom para manter o código limpo, muito usado em Rust)
-opt.colorcolumn = "80"
+-- ── Bytecode cache (Neovim ≥ 0.9): faster startup ────────────────────────────
+if vim.loader then vim.loader.enable() end
 
--- 4. Performance
--- Diminui o tempo de atualização do editor (deixa a interface mais responsiva)
-opt.updatetime = 50
+-- ── Disable unused language providers (saves ~50ms on startup) ───────────────
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_ruby_provider    = 0
+vim.g.loaded_perl_provider    = 0
+vim.g.loaded_node_provider    = 0

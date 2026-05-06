@@ -1,7 +1,13 @@
+--------------------------------------------------------------------------------
+-- Lazy.nvim bootstrap and global plugin spec
+--------------------------------------------------------------------------------
+
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
   local lazyrepo = "https://github.com/folke/lazy.nvim.git"
-  local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
+  local out = vim.fn.system({
+    "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath,
+  })
   if vim.v.shell_error ~= 0 then
     vim.api.nvim_echo({
       { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
@@ -16,31 +22,29 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
   spec = {
+    -- LazyVim core (default UI/keymaps/LSP scaffolding)
     { "LazyVim/LazyVim", import = "lazyvim.plugins" },
-    -- Importa seus plugins customizados a partir da pasta /lua/plugins
+
+    -- User plugin modules under lua/plugins/
     { import = "plugins" },
   },
-  defaults = {
-    -- Ativa o lazy-loading para todos os plugins por padrão
-    lazy = true,
-    -- Usa sempre o commit mais recente dos plugins
-    version = false,
-  },
-  install = { colorscheme = { "catppuccin", "tokyonight", "habamax" } },
-  checker = {
-    enabled = true,
-    notify = false,
-  },
+  defaults = { lazy = true, version = false },
+  install  = { colorscheme = { "tokyonight", "habamax" } },
+  checker  = { enabled = true, notify = false },
   performance = {
     rtp = {
-      -- Desativa plugins padrões do Vim para acelerar o boot
       disabled_plugins = {
-        "gzip",
-        "tarPlugin",
-        "tohtml",
-        "tutor",
-        "zipPlugin",
+        "gzip", "matchit", "matchparen", "netrwPlugin",
+        "tarPlugin", "tohtml", "tutor", "zipPlugin",
       },
     },
   },
 })
+
+--------------------------------------------------------------------------------
+-- Diagnostics policy
+--   * Terminal mode (dev): off — keeps the editor quiet while coding.
+--   * Neovide mode  (docs): on  — needed for ltex-ls (grammar) and marksman
+--                                 (broken-link detection) to surface issues.
+--------------------------------------------------------------------------------
+vim.diagnostic.config({ enabled = vim.g.neovide ~= nil })

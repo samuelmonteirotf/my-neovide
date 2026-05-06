@@ -1,2 +1,7 @@
--- bootstrap lazy.nvim, LazyVim and your plugins
-require("config.lazy")
+--------------------------------------------------------------------------------
+-- Entry point. Bootstrap order matters.
+--------------------------------------------------------------------------------
+
+require("config.lazy")      -- bootstrap lazy.nvim + LazyVim + plugins
+require("config.neovide")   -- Neovide GUI tuning (no-op in terminal)
+require("config.export")    -- :Mdpdf / :Mddocx commands (Neovide only)

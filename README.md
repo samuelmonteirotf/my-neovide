@@ -1,106 +1,130 @@
-# Neovim — Personal Setup
+# inkwell
 
-Personal Neovim configuration built on top of LazyVim, optimized for performance, simplicity, and uninterrupted development flow.
+A dual-mode Neovim configuration on top of LazyVim.
 
-Primarily focused on Rust, TypeScript, and React/Next.js projects while keeping the environment lightweight, predictable, and fully keyboard‑driven.
+- Run as `nvim` in a terminal: full IDE — TypeScript, React, Rust, LSP, autocomplete, format-on-save.
+- Launch with Neovide: turns into a focused Markdown writing studio — bilingual spell + grammar (pt-BR / en), in-buffer rendering, Obsidian-style vault, PDF/DOCX export.
 
----
-
-## Principles
-
-- Fast startup with aggressive lazy-loading
-- IDE-level features without visual clutter
-- Keyboard-first navigation and actions
-- Native integration with Git, LSP, and global search
-- Lean setup: only what improves real workflow
+The split is driven by `vim.g.neovide` evaluated at plugin load, so each side stays uncluttered.
 
 ---
 
-## Supported Stack
+## Layout
 
-- Rust (rust-analyzer + cargo tooling)
-- TypeScript / React / Next.js
-- Lua (config and extensions)
-- Generic LSP support for other languages
+```
+lua/
+├── config/
+│   ├── lazy.lua          bootstrap + diagnostics policy
+│   ├── options.lua       editor options
+│   ├── keymaps.lua       global keymaps
+│   ├── autocmds.lua      format-on-save + Markdown writing mode
+│   ├── neovide.lua       GUI tuning (font, refresh, cursor)
+│   └── export.lua        :Mdpdf / :Mddocx commands (Neovide only)
+└── plugins/
+    ├── ui.lua            theme + lualine
+    ├── editor.lua        textobjects, oil, mini.move/surround, undotree, spectre
+    ├── navigation.lua    harpoon, flash, telescope-fzf, lazygit
+    ├── snippets.lua      Markdown / Obsidian snippet pack
+    ├── dev.lua           ts-context, illuminate, ts-autotag           (terminal only)
+    ├── docs.lua          render-markdown, preview, zen, twilight,
+    │                     obsidian, table-mode, marksman, ltex          (Neovide only)
+    └── gui.lua           bufferline/indentscope off, word-count, dashboard (Neovide only)
+```
 
 ---
 
 ## Requirements
 
-Before installing, make sure you have:
+- Neovim ≥ 0.10
+- Nerd Font in your terminal
+- `ripgrep`, `fd`, `lazygit`
+- `pandoc` and `typst` (for PDF/DOCX export)
+- `gcc` / build-essential (Treesitter, FZF native)
 
-- Neovim ≥ 0.9
-- Git
-- Nerd Font configured in your terminal
-- ripgrep
-- fd
-- lazygit
-- gcc / build-essential
+Optional but recommended for docs mode:
 
----
-
-## Installation
-
-Backup your current config:
-
-```bash
-mv ~/.config/nvim ~/.config/nvim.bak
-```
-
-Clone the repository:
-
-```bash
-git clone git@github.com:samuelmonteirotf/nvim.git ~/.config/nvim
-```
-
-First launch:
-
-```bash
-nvim
-```
-
-Plugins will be installed automatically via lazy.nvim.
+- `Neovide` ≥ 0.13 (`brew install --cask neovide`)
 
 ---
 
-## Main Keymaps
+## Install
 
-Leader: Space
+```bash
+mv ~/.config/nvim ~/.config/nvim.bak 2>/dev/null
+git clone https://github.com/samuelmonteirotf/inkwell.git ~/.config/nvim
+nvim   # plugins install on first launch
+```
 
-Navigation:
-- <leader>ff → Find files
-- <leader>fg → Live grep
-- <C-h/j/k/l> → Navigate splits
-- <leader>, / <leader>. → Buffers
-- <leader>bd → Close buffer
-
-Harpoon:
-- <leader>a → Mark file
-- <C-e> → Harpoon menu
-
-Git:
-- <leader>gg → Lazygit
-
-LSP:
-- gd → Definition
-- gr → References
-- <leader>ca → Code actions
-
-Terminal:
-- <leader>' → Floating terminal
+The Neovide-only stack only downloads when you launch via Neovide. Mason auto-installs `marksman`, `ltex-ls`, `prettier`, and `markdownlint-cli2` on the first Markdown buffer.
 
 ---
 
-## Structure
+## Keymaps
 
-```
-lua/
- ├─ plugins/
- ├─ config/
- ├─ keymaps.lua
- ├─ options.lua
- └─ autocmds.lua
-```
+Leader is `<Space>`.
+
+### Common (both modes)
+
+| Keys | Action |
+|---|---|
+| `<C-h/j/k/l>` | Move between splits |
+| `<leader>,` / `<leader>.` | Previous / next buffer |
+| `<leader>bd` | Close current buffer |
+| `-` | Open Oil in parent directory |
+| `<leader>u` | Toggle Undotree |
+| `<leader>sR` | Project-wide replace (Spectre) |
+| `<leader>a` / `<C-e>` | Harpoon: mark file / open menu |
+| `<C-h/t/n/s>` | Harpoon slots 1–4 |
+| `s` / `S` | Flash jump / Flash treesitter |
+| `<leader>gg` | LazyGit |
+| `gsa{motion}{char}` | Surround add (`gsa iw *` → `*word*`) |
+| `<M-h/j/k/l>` | Move line/block |
+
+### Docs mode (Neovide)
+
+| Keys | Action |
+|---|---|
+| `<leader>mp` | Markdown preview in browser |
+| `<leader>z` | Zen mode |
+| `<leader>tw` | Twilight (dim everything except current paragraph) |
+| `<leader>tm` | Table mode (auto-align as you type) |
+| `<leader>x` | Toggle checkbox |
+| `<C-r>` | Renumber list |
+| `<leader>ep` | Export current buffer to PDF (typst engine) |
+| `<leader>ed` | Export current buffer to DOCX |
+| `<leader>eo` | Open last exported file in default app |
+| `<leader>cp` / `<leader>ce` | LTeX language: pt-BR / en-US |
+| `<leader>on/od/oo/of/ob/ot` | Obsidian: new / daily / search / follow / backlinks / tags |
+
+---
+
+## Snippets
+
+Type a trigger in any Markdown buffer and press `<Tab>`:
+
+`frontmatter` `note` `daily` `meeting` `task` `link` `tag` `ref` `img` `now`
+`table` `note!` `tip!` `warn!` `info!` `quote`
+`lua` `py` `ts` `rs` `bash` `sh` `json`
+
+23 snippets total — see `lua/plugins/snippets.lua` for the full list.
+
+---
+
+## Bilingual writing (pt-BR + en)
+
+- Spell-check: `spelllang = "pt_br,en"` — both dictionaries active simultaneously.
+- Grammar: `ltex-ls` (LanguageTool) — defaults to pt-BR; switch with `:LtexLang en-US`.
+- Diagnostics are turned **on** in Neovide mode and **off** in terminal mode, so grammar warnings only appear while writing prose.
+
+---
+
+## Performance posture
+
+- `vim.loader` enabled (Lua bytecode cache).
+- Python / Ruby / Perl / Node providers disabled (saves ~50 ms startup).
+- Neovide refresh capped at 60 Hz (MacBook Air panel) with idle drop to 5 fps.
+- All Neovide animations off — instant cursor, instant scroll.
+- `synmaxcol = 300` skips syntax on minified / log lines.
 
 ---
 
