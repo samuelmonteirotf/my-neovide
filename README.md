@@ -1,4 +1,4 @@
-# inkwell
+# my-neovide
 
 A dual-mode Neovim configuration on top of LazyVim.
 
@@ -51,7 +51,7 @@ Optional but recommended for docs mode:
 
 ```bash
 mv ~/.config/nvim ~/.config/nvim.bak 2>/dev/null
-git clone https://github.com/samuelmonteirotf/inkwell.git ~/.config/nvim
+git clone https://github.com/samuelmonteirotf/my-neovide.git ~/.config/nvim
 nvim   # plugins install on first launch
 ```
 
