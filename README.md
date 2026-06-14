@@ -2,8 +2,8 @@
 
 A dual-mode Neovim configuration on top of LazyVim.
 
-- Run as `nvim` in a terminal: full IDE — TypeScript, React, Rust, LSP, autocomplete, format-on-save.
-- Launch with Neovide: turns into a focused Markdown writing studio — bilingual spell + grammar (pt-BR / en), in-buffer rendering, Obsidian-style vault, PDF/DOCX export.
+- Run as `nvim` in a terminal: full IDE (TypeScript, React, Rust, LSP, autocomplete, format-on-save).
+- Launch with Neovide: turns into a focused Markdown writing studio with bilingual spell + grammar (pt-BR / en), in-buffer rendering, Obsidian-style vault, PDF/DOCX export.
 
 The split is driven by `vim.g.neovide` evaluated at plugin load, so each side stays uncluttered.
 
@@ -51,7 +51,7 @@ Optional but recommended for docs mode:
 
 ### Arch-based Linux (Arch, Manjaro, EndeavourOS, Garuda, CachyOS, Artix)
 
-A single script handles every dependency, the clone, the first plugin sync, the Mason language servers and the shell aliases. It is idempotent — re-running is safe.
+A single script handles every dependency, the clone, the first plugin sync, the Mason language servers and the shell aliases. It is idempotent: re-running is safe.
 
 Inspect it first, then execute:
 
@@ -92,35 +92,35 @@ Leader is `<Space>`.
 
 ### Common (both modes)
 
-| Keys | Action |
-|---|---|
-| `<C-h/j/k/l>` | Move between splits |
-| `<leader>,` / `<leader>.` | Previous / next buffer |
-| `<leader>bd` | Close current buffer |
-| `-` | Open Oil in parent directory |
-| `<leader>u` | Toggle Undotree |
-| `<leader>sR` | Project-wide replace (Spectre) |
-| `<leader>a` / `<C-e>` | Harpoon: mark file / open menu |
-| `<C-h/t/n/s>` | Harpoon slots 1–4 |
-| `s` / `S` | Flash jump / Flash treesitter |
-| `<leader>gg` | LazyGit |
-| `gsa{motion}{char}` | Surround add (`gsa iw *` → `*word*`) |
-| `<M-h/j/k/l>` | Move line/block |
+| Keys                      | Action                               |
+| ------------------------- | ------------------------------------ |
+| `<C-h/j/k/l>`             | Move between splits                  |
+| `<leader>,` / `<leader>.` | Previous / next buffer               |
+| `<leader>bd`              | Close current buffer                 |
+| `-`                       | Open Oil in parent directory         |
+| `<leader>u`               | Toggle Undotree                      |
+| `<leader>sR`              | Project-wide replace (Spectre)       |
+| `<leader>a` / `<C-e>`     | Harpoon: mark file / open menu       |
+| `<C-h/t/n/s>`             | Harpoon slots 1–4                    |
+| `s` / `S`                 | Flash jump / Flash treesitter        |
+| `<leader>gg`              | LazyGit                              |
+| `gsa{motion}{char}`       | Surround add (`gsa iw *` → `*word*`) |
+| `<M-h/j/k/l>`             | Move line/block                      |
 
 ### Docs mode (Neovide)
 
-| Keys | Action |
-|---|---|
-| `<leader>mp` | Markdown preview in browser |
-| `<leader>z` | Zen mode |
-| `<leader>tw` | Twilight (dim everything except current paragraph) |
-| `<leader>tm` | Table mode (auto-align as you type) |
-| `<leader>x` | Toggle checkbox |
-| `<C-r>` | Renumber list |
-| `<leader>ep` | Export current buffer to PDF (typst engine) |
-| `<leader>ed` | Export current buffer to DOCX |
-| `<leader>eo` | Open last exported file in default app |
-| `<leader>cp` / `<leader>ce` | LTeX language: pt-BR / en-US |
+| Keys                        | Action                                                     |
+| --------------------------- | ---------------------------------------------------------- |
+| `<leader>mp`                | Markdown preview in browser                                |
+| `<leader>z`                 | Zen mode                                                   |
+| `<leader>tw`                | Twilight (dim everything except current paragraph)         |
+| `<leader>tm`                | Table mode (auto-align as you type)                        |
+| `<leader>x`                 | Toggle checkbox                                            |
+| `<C-r>`                     | Renumber list                                              |
+| `<leader>ep`                | Export current buffer to PDF (typst engine)                |
+| `<leader>ed`                | Export current buffer to DOCX                              |
+| `<leader>eo`                | Open last exported file in default app                     |
+| `<leader>cp` / `<leader>ce` | LTeX language: pt-BR / en-US                               |
 | `<leader>on/od/oo/of/ob/ot` | Obsidian: new / daily / search / follow / backlinks / tags |
 
 ---
@@ -133,14 +133,14 @@ Type a trigger in any Markdown buffer and press `<Tab>`:
 `table` `note!` `tip!` `warn!` `info!` `quote`
 `lua` `py` `ts` `rs` `bash` `sh` `json`
 
-23 snippets total — see `lua/plugins/snippets.lua` for the full list.
+23 snippets total: see `lua/plugins/snippets.lua` for the full list.
 
 ---
 
 ## Bilingual writing (pt-BR + en)
 
-- Spell-check: `spelllang = "pt_br,en"` — both dictionaries active simultaneously.
-- Grammar: `ltex-ls` (LanguageTool) — defaults to pt-BR; switch with `:LtexLang en-US`.
+- Spell-check: `spelllang = "pt_br,en"` (both dictionaries active simultaneously).
+- Grammar: `ltex-ls` (LanguageTool) (defaults to pt-BR; switch with `:LtexLang en-US`).
 - Diagnostics are turned **on** in Neovide mode and **off** in terminal mode, so grammar warnings only appear while writing prose.
 
 ---
@@ -150,7 +150,7 @@ Type a trigger in any Markdown buffer and press `<Tab>`:
 - `vim.loader` enabled (Lua bytecode cache).
 - Python / Ruby / Perl / Node providers disabled (saves ~50 ms startup).
 - Neovide refresh capped at 60 Hz (MacBook Air panel) with idle drop to 5 fps.
-- All Neovide animations off — instant cursor, instant scroll.
+- All Neovide animations off: instant cursor, instant scroll.
 - `synmaxcol = 300` skips syntax on minified / log lines.
 
 ---
