@@ -6,7 +6,12 @@ local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
   local lazyrepo = "https://github.com/folke/lazy.nvim.git"
   local out = vim.fn.system({
-    "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath,
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "--branch=stable",
+    lazyrepo,
+    lazypath,
   })
   if vim.v.shell_error ~= 0 then
     vim.api.nvim_echo({
@@ -29,22 +34,29 @@ require("lazy").setup({
     { import = "plugins" },
   },
   defaults = { lazy = true, version = false },
-  install  = { colorscheme = { "tokyonight", "habamax" } },
-  checker  = { enabled = true, notify = false },
+  install = { colorscheme = { "tokyonight", "habamax" } },
+  checker = { enabled = true, notify = false },
   performance = {
     rtp = {
       disabled_plugins = {
-        "gzip", "matchit", "matchparen", "netrwPlugin",
-        "tarPlugin", "tohtml", "tutor", "zipPlugin",
+        "gzip",
+        "matchit",
+        "matchparen",
+        "netrwPlugin",
+        "tarPlugin",
+        "tohtml",
+        "tutor",
+        "zipPlugin",
       },
     },
   },
 })
 
 --------------------------------------------------------------------------------
--- Diagnostics policy
---   * Terminal mode (dev): off — keeps the editor quiet while coding.
---   * Neovide mode  (docs): on  — needed for ltex-ls (grammar) and marksman
---                                 (broken-link detection) to surface issues.
+-- Diagnostics: virtual text + signs always on. DevOps work lives and dies by
+-- the linters (tflint, yamllint, ansible-lint, hadolint, shellcheck).
 --------------------------------------------------------------------------------
-vim.diagnostic.config({ enabled = vim.g.neovide ~= nil })
+vim.diagnostic.config({
+  virtual_text = { spacing = 2, prefix = "●" },
+  severity_sort = true,
+})

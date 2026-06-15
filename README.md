@@ -1,157 +1,151 @@
 # my-neovide
 
-A dual-mode Neovim configuration on top of LazyVim.
-
-- Run as `nvim` in a terminal: full IDE (TypeScript, React, Rust, LSP, autocomplete, format-on-save).
-- Launch with Neovide: turns into a focused Markdown writing studio with bilingual spell + grammar (pt-BR / en), in-buffer rendering, Obsidian-style vault, PDF/DOCX export.
-
-The split is driven by `vim.g.neovide` evaluated at plugin load, so each side stays uncluttered.
+A Neovim distribution optimized for DevOps engineers, built on LazyVim and tuned for Neovide. It provides an IDE-class experience featuring LSP, debugging, run configurations, Git integration, database client, REST client, breadcrumbs, and terminal. The distribution is tailored for DevOps technologies: Terraform, OpenTofu, Kubernetes, Helm, ArgoCD, Ansible, Docker, Go, Python, Bash, and CI/CD pipelines.
 
 ---
 
-## Layout
+## Features
+
+| Category | Tools |
+| --- | --- |
+| Languages / LSP | Terraform/HCL, YAML (with Kubernetes and Helm schemas), Ansible, Docker, Go, Python, Bash, JSON, TOML, SQL, Lua, Markdown |
+| Linting / Formatting | tflint, yamllint, ansible-lint, hadolint, shellcheck, shfmt, gofumpt, ruff, prettier, stylua |
+| Debugging (DAP) | Go (delve) and Python (debugpy) using `<F5>`, `<F10>`, `<F11>` step keys |
+| Run Configurations | Overseer tasks: `terraform plan/apply`, `kubectl apply`, `ansible-playbook`, `helm upgrade` |
+| Git Integration | lazygit via `<leader>gg`, gitsigns hunks, Neogit, Diffview (diff, merge, and history) |
+| Cluster / Containers | k9s and lazydocker in a floating terminal, with live kube-context in the statusline |
+| Database Client | vim-dadbod UI via the LazyVim SQL extra |
+| REST Client | kulala to execute `.http` requests from the editor |
+| Navigation | Telescope, Harpoon, Flash, dropbar breadcrumbs, Oil, Spectre |
+
+---
+
+## Structure
 
 ```
 lua/
 ├── config/
-│   ├── lazy.lua          bootstrap + diagnostics policy
+│   ├── lazy.lua          bootstrap and diagnostics
 │   ├── options.lua       editor options
 │   ├── keymaps.lua       global keymaps
-│   ├── autocmds.lua      format-on-save + Markdown writing mode
-│   ├── neovide.lua       GUI tuning (font, refresh, cursor)
-│   └── export.lua        :Mdpdf / :Mddocx commands (Neovide only)
+│   ├── autocmds.lua      DevOps filetype detection and terminal tweaks
+│   └── neovide.lua       GUI tuning (font, refresh, cursor, clipboard)
 └── plugins/
-    ├── ui.lua            theme + lualine
-    ├── editor.lua        textobjects, oil, mini.move/surround, undotree, spectre
-    ├── navigation.lua    harpoon, flash, telescope-fzf, lazygit
-    ├── snippets.lua      Markdown / Obsidian snippet pack
-    ├── dev.lua           ts-context, illuminate, ts-autotag           (terminal only)
-    ├── docs.lua          render-markdown, preview, zen, twilight,
-    │                     obsidian, table-mode, marksman, ltex          (Neovide only)
-    └── gui.lua           bufferline/indentscope off, word-count, dashboard (Neovide only)
+    ├── ui.lua            theme, dropbar breadcrumbs, dashboard, kube-context
+    ├── editor.lua        treesitter, textobjects, context, oil, mini, spectre
+    ├── navigation.lua    harpoon, flash, telescope-fzf
+    ├── git.lua           neogit and diffview
+    ├── terminal.lua      k9s, lazydocker, and floating terminal (Snacks)
+    ├── tasks.lua         overseer run-configs (terraform/kubectl/ansible/helm)
+    ├── dap.lua           IDE F-keys on top of the dap.core extra
+    ├── rest.lua          kulala HTTP client
+    ├── snippets.lua      DevOps snippet pack
+    └── devops.lua        shell tooling, extra linters, and yamlls tweaks
 ```
+
+Language configurations use LazyVim extras (defined in `lazyvim.json`). Each language includes LSP, treesitter parser, linter, and formatter integrations.
 
 ---
 
 ## Requirements
 
-- Neovim ≥ 0.10
-- Nerd Font in your terminal
-- `ripgrep`, `fd`, `lazygit`
-- `pandoc` and `typst` (for PDF/DOCX export)
-- `gcc` / build-essential (Treesitter, FZF native)
+* Neovim 0.10 or higher (tested on 0.12)
+* A Nerd Font
+* `ripgrep`, `fd`, `git`, and a C compiler (`gcc` or `make` for Treesitter and fzf-native)
+* Node.js and Python (required by Mason for language server installations)
+* Optional CLI utilities: `kubectl`, `helm`, `k9s`, `lazydocker`, `lazygit`, `docker`, `terraform` or `tofu`, and `ansible`
 
-Optional but recommended for docs mode:
-
-- `Neovide` ≥ 0.13 (`brew install --cask neovide`)
+Language servers, linters, and formatters are installed automatically by Mason on first launch. No manual installation of these components is required.
 
 ---
 
-## Install
+## Installation
 
-### Arch-based Linux (Arch, Manjaro, EndeavourOS, Garuda, CachyOS, Artix)
-
-A single script handles every dependency, the clone, the first plugin sync, the Mason language servers and the shell aliases. It is idempotent: re-running is safe.
-
-Inspect it first, then execute:
+### Automated Script (Arch Linux, Manjaro, EndeavourOS, CachyOS, Artix)
 
 ```bash
+# Review the installation script
 curl -fsSL https://raw.githubusercontent.com/samuelmonteirotf/my-neovide/main/scripts/install-arch.sh | less
+
+# Execute the installation script
 curl -fsSL https://raw.githubusercontent.com/samuelmonteirotf/my-neovide/main/scripts/install-arch.sh | bash
 ```
 
-Or clone and run locally:
+The script installs system dependencies, creates a backup of any existing Neovim configuration, clones the repository to `~/.config/nvim`, syncs plugins, and configures `nv` and `nvp` aliases.
+
+### Manual Installation (All Operating Systems)
 
 ```bash
-git clone https://github.com/samuelmonteirotf/my-neovide.git /tmp/my-neovide
-bash /tmp/my-neovide/scripts/install-arch.sh
-```
-
-When it finishes:
-
-```bash
-source ~/.zshrc   # or ~/.bashrc
-nv                # opens Neovide on your notes vault
-```
-
-### Manual install (any OS)
-
-```bash
+# Back up existing configuration
 mv ~/.config/nvim ~/.config/nvim.bak 2>/dev/null
-git clone https://github.com/samuelmonteirotf/my-neovide.git ~/.config/nvim
-nvim   # plugins install on first launch
-```
 
-The Neovide-only stack only downloads when you launch via Neovide. Mason auto-installs `marksman`, `ltex-ls`, `prettier`, and `markdownlint-cli2` on the first Markdown buffer.
+# Clone the repository
+git clone https://github.com/samuelmonteirotf/my-neovide.git ~/.config/nvim
+
+# Launch Neovim to trigger automatic plugin and tool installation
+nvim
+```
 
 ---
 
 ## Keymaps
 
-Leader is `<Space>`.
+The leader key is configured to `<Space>`. LazyVim default keymaps are active. The table below outlines the custom keymaps added or modified in this distribution.
 
-### Common (both modes)
-
-| Keys                      | Action                               |
-| ------------------------- | ------------------------------------ |
-| `<C-h/j/k/l>`             | Move between splits                  |
-| `<leader>,` / `<leader>.` | Previous / next buffer               |
-| `<leader>bd`              | Close current buffer                 |
-| `-`                       | Open Oil in parent directory         |
-| `<leader>u`               | Toggle Undotree                      |
-| `<leader>sR`              | Project-wide replace (Spectre)       |
-| `<leader>a` / `<C-e>`     | Harpoon: mark file / open menu       |
-| `<C-h/t/n/s>`             | Harpoon slots 1–4                    |
-| `s` / `S`                 | Flash jump / Flash treesitter        |
-| `<leader>gg`              | LazyGit                              |
-| `gsa{motion}{char}`       | Surround add (`gsa iw *` → `*word*`) |
-| `<M-h/j/k/l>`             | Move line/block                      |
-
-### Docs mode (Neovide)
-
-| Keys                        | Action                                                     |
-| --------------------------- | ---------------------------------------------------------- |
-| `<leader>mp`                | Markdown preview in browser                                |
-| `<leader>z`                 | Zen mode                                                   |
-| `<leader>tw`                | Twilight (dim everything except current paragraph)         |
-| `<leader>tm`                | Table mode (auto-align as you type)                        |
-| `<leader>x`                 | Toggle checkbox                                            |
-| `<C-r>`                     | Renumber list                                              |
-| `<leader>ep`                | Export current buffer to PDF (typst engine)                |
-| `<leader>ed`                | Export current buffer to DOCX                              |
-| `<leader>eo`                | Open last exported file in default app                     |
-| `<leader>cp` / `<leader>ce` | LTeX language: pt-BR / en-US                               |
-| `<leader>on/od/oo/of/ob/ot` | Obsidian: new / daily / search / follow / backlinks / tags |
+| Keymap | Action |
+| --- | --- |
+| `<C-h/j/k/l>` | Move between splits |
+| `<leader>,` / `<leader>.` | Previous / next buffer |
+| `-` | Open Oil (parent directory navigation) |
+| `<leader>;` | Open dropbar breadcrumbs picker |
+| `s` / `S` | Flash jump / Treesitter flash jump |
+| `<leader>ha` / `<leader>hh` | Harpoon: add file / toggle menu |
+| `<leader>h1…h4` | Harpoon: jump to files 1 to 4 |
+| `<M-h/j/k/l>` | Move line or block |
+| `<leader>sR` / `<leader>sw` | Spectre: project replace / search word under cursor |
+| `<leader>U` | Toggle Undotree |
+| **Git** | |
+| `<leader>gg` | Open lazygit |
+| `<leader>gn` | Open Neogit |
+| `<leader>gd` / `<leader>gD` | Diffview: open working tree diff / view file history |
+| **Debugging** | |
+| `<F5>` / `<F10>` / `<F11>` / `<S-F11>` | DAP: continue / step over / step into / step out |
+| `<leader>d…` | Access full DAP menu |
+| **Tasks (Overseer)** | |
+| `<leader>or` / `<leader>ot` | Run task / toggle task list |
+| **Terminal / Operations** | |
+| `<leader>tk` / `<leader>tl` | Launch k9s / lazydocker |
+| `<leader>tt` / `<c-/>` | Toggle floating terminal |
+| **REST Client** | |
+| `<leader>Rs` / `<leader>Ra` | Send request / send all requests in `.http` file |
 
 ---
 
 ## Snippets
 
-Type a trigger in any Markdown buffer and press `<Tab>`:
+To trigger a snippet, enter the prefix and press `<Tab>`:
 
-`frontmatter` `note` `daily` `meeting` `task` `link` `tag` `ref` `img` `now`
-`table` `note!` `tip!` `warn!` `info!` `quote`
-`lua` `py` `ts` `rs` `bash` `sh` `json`
-
-23 snippets total: see `lua/plugins/snippets.lua` for the full list.
-
----
-
-## Bilingual writing (pt-BR + en)
-
-- Spell-check: `spelllang = "pt_br,en"` (both dictionaries active simultaneously).
-- Grammar: `ltex-ls` (LanguageTool) (defaults to pt-BR; switch with `:LtexLang en-US`).
-- Diagnostics are turned **on** in Neovide mode and **off** in terminal mode, so grammar warnings only appear while writing prose.
+* **Dockerfile**: `dockerfile`
+* **Kubernetes (YAML)**: `deploy`, `svc`, `ing`, `cm`, `ns`
+* **CI/CD (YAML)**: `ghaction`
+* **Terraform**: `res`, `data`, `var`, `out`, `mod`
+* **Ansible**: `task`, `play`
 
 ---
 
-## Performance posture
+## Development
 
-- `vim.loader` enabled (Lua bytecode cache).
-- Python / Ruby / Perl / Node providers disabled (saves ~50 ms startup).
-- Neovide refresh capped at 60 Hz (MacBook Air panel) with idle drop to 5 fps.
-- All Neovide animations off: instant cursor, instant scroll.
-- `synmaxcol = 300` skips syntax on minified / log lines.
+To format and lint the codebase:
+
+```bash
+# Check formatting
+stylua --check .
+
+# Run static analysis
+luacheck init.lua lua/
+```
+
+CI workflows (`.github/workflows/ci.yml`) execute these checks on every push or pull request to the `main` branch.
 
 ---
 

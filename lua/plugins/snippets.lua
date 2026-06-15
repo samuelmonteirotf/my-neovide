@@ -1,148 +1,205 @@
 --------------------------------------------------------------------------------
--- Markdown / Obsidian snippet pack.
+-- DevOps snippet pack (LuaSnip, already bundled by LazyVim).
 --
--- Triggers (type the word, press <Tab>):
---   frontmatter  full YAML header with title/tags/created
---   daily        daily-note skeleton (date + sections)
---   meeting      meeting-note skeleton (attendees + agenda + actions)
---   note         quick note with frontmatter
---   task         "- [ ] " task line
---   link         [[wikilink]]
---   tag          #tag
---   ref          [text](url) Markdown link
---   img          ![alt](attachments/img.png)
---   now          inserts current timestamp YYYY-MM-DD HH:MM
---   table        4×3 table skeleton
---   note!        callout "> [!note]"
---   tip!         callout "> [!tip]"
---   warn!        callout "> [!warning]"
---   info!        callout "> [!info]"
---   quote        "> "  blockquote line
---   lua / py / ts / rs / bash / sh / json   fenced code blocks
---
--- Loaded in both modes (LuaSnip is already in LazyVim; adding snippets is free).
+-- Type a trigger and press <Tab>:
+--   dockerfile          → multi-stage-ready Dockerfile skeleton
+--   k8s yaml: deploy / svc / ing / cm / ns
+--   terraform: res / var / out / mod / data
+--   yaml (CI): ghaction → GitHub Actions workflow skeleton
+--   ansible: task / play
 --------------------------------------------------------------------------------
 
 return {
   {
     "L3MON4D3/LuaSnip",
     config = function(_, opts)
-      require("luasnip").config.setup(opts)
-
       local ls = require("luasnip")
-      local s  = ls.snippet
-      local t  = ls.text_node
-      local i  = ls.insert_node
-      local f  = ls.function_node
+      ls.config.setup(opts)
 
-      local function today()    return os.date("%Y-%m-%d")          end
-      local function timestamp() return os.date("%Y-%m-%d %H:%M")    end
+      local s = ls.snippet
+      local t = ls.text_node
+      local i = ls.insert_node
 
-      ls.add_snippets("markdown", {
-        ------------------------------------------------------------------------
-        -- Frontmatter & note skeletons
-        ------------------------------------------------------------------------
-        s("frontmatter", {
-          t({ "---", "title: " }),     i(1, "Title"),
-          t({ "",   "tags: [" }),      i(2, "tag"),
-          t({ "]",  "created: " }),    f(today),
-          t({ "",   "---", "", "# " }), i(3, "Heading"),
-          t({ "", "", "" }),           i(0),
+      ----------------------------------------------------------------------
+      -- Dockerfile
+      ----------------------------------------------------------------------
+      ls.add_snippets("dockerfile", {
+        s("dockerfile", {
+          t("FROM "),
+          i(1, "alpine:3.20"),
+          t({ "", "", "WORKDIR " }),
+          i(2, "/app"),
+          t({ "", "", "COPY . .", "", "RUN " }),
+          i(3, "true"),
+          t({ "", "", 'CMD ["' }),
+          i(4, "app"),
+          t('"]'),
+          i(0),
         }),
+      })
 
-        s("note", {
-          t({ "---", "title: " }),  i(1, "Title"),
-          t({ "",   "tags: [" }),   i(2, "note"),
-          t({ "]",  "created: " }), f(today),
-          t({ "", "---", "", "# " }), f(function(args) return args[1][1] end, { 1 }),
-          t({ "", "", "" }),         i(0),
+      ----------------------------------------------------------------------
+      -- Kubernetes manifests (plain yaml)
+      ----------------------------------------------------------------------
+      ls.add_snippets("yaml", {
+        s("deploy", {
+          t({ "apiVersion: apps/v1", "kind: Deployment", "metadata:", "  name: " }),
+          i(1, "app"),
+          t({ "", "spec:", "  replicas: " }),
+          i(2, "1"),
+          t({ "", "  selector:", "    matchLabels:", "      app: " }),
+          i(3, "app"),
+          t({ "", "  template:", "    metadata:", "      labels:", "        app: " }),
+          i(4, "app"),
+          t({ "", "    spec:", "      containers:", "        - name: " }),
+          i(5, "app"),
+          t({ "", "          image: " }),
+          i(6, "image:tag"),
+          t({ "", "          ports:", "            - containerPort: " }),
+          i(7, "8080"),
+          i(0),
         }),
-
-        s("daily", {
-          t({ "---", "title: Daily " }), f(today),
-          t({ "",   "tags: [daily]",
-                    "created: " }),     f(today),
-          t({ "",   "---", "",
-                    "# " }),            f(today),
-          t({ "", "",
-                    "## Foco do dia",
-                    "",
-                    "- [ ] " }),        i(1, "main task"),
-          t({ "", "",
-                    "## Notas",
-                    "",
-                    "" }),              i(0),
-          t({ "", "",
-                    "## Reflexão",
-                    "" }),
+        s("svc", {
+          t({ "apiVersion: v1", "kind: Service", "metadata:", "  name: " }),
+          i(1, "app"),
+          t({ "", "spec:", "  selector:", "    app: " }),
+          i(2, "app"),
+          t({ "", "  ports:", "    - port: " }),
+          i(3, "80"),
+          t({ "", "      targetPort: " }),
+          i(4, "8080"),
+          i(0),
         }),
-
-        s("meeting", {
-          t({ "---", "title: Meeting " }), i(1, "topic"),
-          t({ "",   "date: " }),           f(today),
-          t({ "",   "tags: [meeting]",
-                    "attendees: [" }),     i(2, "you, them"),
-          t({ "]",  "---", "",
-                    "# " }),               f(function(args) return "Meeting — " .. args[1][1] end, { 1 }),
-          t({ "", "",
-                    "## Agenda",
-                    "",
-                    "- " }),               i(3, "topic"),
-          t({ "", "",
-                    "## Notas",
-                    "",
-                    "" }),                 i(0),
-          t({ "", "",
-                    "## Action items",
-                    "",
-                    "- [ ] " }),
+        s("ing", {
+          t({ "apiVersion: networking.k8s.io/v1", "kind: Ingress", "metadata:", "  name: " }),
+          i(1, "app"),
+          t({ "", "spec:", "  rules:", "    - host: " }),
+          i(2, "example.com"),
+          t({
+            "",
+            "      http:",
+            "        paths:",
+            "          - path: /",
+            "            pathType: Prefix",
+            "            backend:",
+            "              service:",
+            "                name: ",
+          }),
+          i(3, "app"),
+          t({ "", "                port:", "                  number: " }),
+          i(4, "80"),
+          i(0),
         }),
-
-        ------------------------------------------------------------------------
-        -- Inline elements
-        ------------------------------------------------------------------------
-        s("task", { t("- [ ] "),  i(0) }),
-        s("link", { t("[["),      i(1, "note"), t("]]"), i(0) }),
-        s("tag",  { t("#"),       i(1, "tag"),  t(" "),  i(0) }),
-        s("ref",  { t("["),       i(1, "text"), t("]("), i(2, "url"), t(")"), i(0) }),
-        s("img",  { t("!["),      i(1, "alt"),  t("](attachments/"), i(2, "image.png"), t(")"), i(0) }),
-        s("now",  { f(timestamp) }),
-
-        ------------------------------------------------------------------------
-        -- Tables
-        ------------------------------------------------------------------------
-        s("table", {
-          t({ "| " }), i(1, "Col 1"),
-          t({ " | " }), i(2, "Col 2"),
-          t({ " | " }), i(3, "Col 3"),
-          t({ " |",
-              "|---|---|---|",
-              "| " }), i(4, "a"),
-          t({ " | " }), i(5, "b"),
-          t({ " | " }), i(6, "c"),
-          t({ " |",
-              "" }),    i(0),
+        s("cm", {
+          t({ "apiVersion: v1", "kind: ConfigMap", "metadata:", "  name: " }),
+          i(1, "app-config"),
+          t({ "", "data:", "  " }),
+          i(2, "key"),
+          t(": "),
+          i(3, "value"),
+          i(0),
         }),
+        s("ns", {
+          t({ "apiVersion: v1", "kind: Namespace", "metadata:", "  name: " }),
+          i(1, "team"),
+          i(0),
+        }),
+        s("ghaction", {
+          t({ "name: " }),
+          i(1, "CI"),
+          t({
+            "",
+            "on:",
+            "  push:",
+            "    branches: [main]",
+            "  pull_request:",
+            "    branches: [main]",
+            "",
+            "jobs:",
+            "  ",
+          }),
+          i(2, "build"),
+          t({ ":", "    runs-on: ubuntu-latest", "    steps:", "      - uses: actions/checkout@v4", "      - name: " }),
+          i(3, "Run"),
+          t({ "", "        run: " }),
+          i(4, "make test"),
+          i(0),
+        }),
+      })
 
-        ------------------------------------------------------------------------
-        -- Obsidian callouts
-        ------------------------------------------------------------------------
-        s("note!", { t({ "> [!note] " }), i(1, "Title"), t({ "", "> " }), i(0) }),
-        s("tip!",  { t({ "> [!tip] "  }), i(1, "Title"), t({ "", "> " }), i(0) }),
-        s("warn!", { t({ "> [!warning] " }), i(1, "Title"), t({ "", "> " }), i(0) }),
-        s("info!", { t({ "> [!info] " }), i(1, "Title"), t({ "", "> " }), i(0) }),
-        s("quote", { t("> "), i(0) }),
+      ----------------------------------------------------------------------
+      -- Terraform / HCL
+      ----------------------------------------------------------------------
+      ls.add_snippets("terraform", {
+        s("res", {
+          t('resource "'),
+          i(1, "type"),
+          t('" "'),
+          i(2, "name"),
+          t({ '" {', "  " }),
+          i(0),
+          t({ "", "}" }),
+        }),
+        s("data", {
+          t('data "'),
+          i(1, "type"),
+          t('" "'),
+          i(2, "name"),
+          t({ '" {', "  " }),
+          i(0),
+          t({ "", "}" }),
+        }),
+        s("var", {
+          t('variable "'),
+          i(1, "name"),
+          t({ '" {', "  type        = " }),
+          i(2, "string"),
+          t({ "", '  description = "' }),
+          i(3, ""),
+          t({ '"', "}" }),
+          i(0),
+        }),
+        s("out", {
+          t('output "'),
+          i(1, "name"),
+          t({ '" {', "  value = " }),
+          i(2, ""),
+          t({ "", "}" }),
+          i(0),
+        }),
+        s("mod", {
+          t('module "'),
+          i(1, "name"),
+          t({ '" {', '  source = "' }),
+          i(2, "./modules/x"),
+          t({ '"', "  " }),
+          i(0),
+          t({ "", "}" }),
+        }),
+      })
 
-        ------------------------------------------------------------------------
-        -- Fenced code blocks
-        ------------------------------------------------------------------------
-        s("lua",  { t({ "```lua",  "" }), i(0), t({ "", "```" }) }),
-        s("py",   { t({ "```python", "" }), i(0), t({ "", "```" }) }),
-        s("ts",   { t({ "```typescript", "" }), i(0), t({ "", "```" }) }),
-        s("rs",   { t({ "```rust", "" }), i(0), t({ "", "```" }) }),
-        s("bash", { t({ "```bash", "" }), i(0), t({ "", "```" }) }),
-        s("sh",   { t({ "```sh",   "" }), i(0), t({ "", "```" }) }),
-        s("json", { t({ "```json", "" }), i(0), t({ "", "```" }) }),
+      ----------------------------------------------------------------------
+      -- Ansible (yaml.ansible)
+      ----------------------------------------------------------------------
+      ls.add_snippets("yaml.ansible", {
+        s("task", {
+          t("- name: "),
+          i(1, "describe the task"),
+          t({ "", "  " }),
+          i(2, "ansible.builtin.command"),
+          t({ ":", "    " }),
+          i(0),
+        }),
+        s("play", {
+          t("- name: "),
+          i(1, "play name"),
+          t({ "", "  hosts: " }),
+          i(2, "all"),
+          t({ "", "  become: true", "  tasks:", "    - name: " }),
+          i(3, "first task"),
+          t({ "", "      ansible.builtin.ping:" }),
+          i(0),
+        }),
       })
     end,
   },
